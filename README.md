@@ -1,6 +1,6 @@
 # DQ.Deploy
 
-## Slack bot for deploying from bitbucket
+## Slack slack command for deploying from bitbucket
 
 ### Required Environment Variables to be able to run slack bot
 
