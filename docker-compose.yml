@@ -1,0 +1,12 @@
+version: '2.1'
+
+services:
+    dq.deploy:
+        image: dq.deploy
+        build: .
+        env_file:
+            - .env
+        environment:
+            - NODE_ENV=production
+        ports:
+            - 4390:4390

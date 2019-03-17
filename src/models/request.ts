@@ -1,6 +1,7 @@
 import { Request } from 'express';
 
-export interface DQRequest extends Request {
+export default interface DQRequest extends Request {
     branches: object;
     responseUrl: string;
+    commands: string[];
 }

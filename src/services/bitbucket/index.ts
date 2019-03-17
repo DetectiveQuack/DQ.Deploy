@@ -1,6 +1,6 @@
-import { makeRequest } from './make-request';
+import makeRequest from './make-request';
 
-export class Bitbucket {
+class Bitbucket {
     private constructor() {}
 
     public static async branchExists(branch: string, repo: string) {
@@ -15,3 +15,5 @@ export class Bitbucket {
         return values[0];
     }
 }
+
+export default Bitbucket;

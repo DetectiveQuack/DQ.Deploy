@@ -1,52 +1,48 @@
-import { NextFunction, Response } from 'express';
-import { DQRequest } from '../models/request';
-import { Bitbucket } from '../services/bitbucket';
-import { jsonResponse } from './response';
+import Bitbucket from '../services/bitbucket';
 
-const validateText = async (text: string) => {
-    const branches: { client: object | null; api: object | null; error: string | null } = {
+const getErrorMsg = (client: object, api: object) => {
+    if (!client && !api) {
+        return 'Both Client and API branches do not exist, branches are case sensitive';
+    }
+
+    if (!client) {
+        return 'Client branch does not exist, branches are case sensitive';
+    }
+
+    if (!api) {
+        return 'API branch does not exist, branches are case sensitive';
+    }
+
+    return null;
+};
+
+const validateText = async (branches: string[]) => {
+    const branchResults: { client: object | null; api: object | null; error: string | null } = {
         client: null,
         api: null,
         error: null,
     };
 
-    if (!text || text.split(' ').length < 2) {
-        branches.error = 'Typing `/deploy [Client branch] [API branch]` will build and deploy to preprod';
+    const [client, api] = branches;
 
-        return branches;
+    let clientBranch = null;
+    let apiBranch = null;
+
+    try {
+        clientBranch = await Bitbucket.branchExists(client, process.env.CLIENT_REPO_NAME!);
+        apiBranch = await Bitbucket.branchExists(api, process.env.API_REPO_NAME!);
+    } catch (err) {
+        branchResults.error = `Something went wrong with Bitbucket ${err.toString()}`;
+        return branchResults;
     }
 
-    const [client, api] = text.split(' ');
+    branchResults.error = getErrorMsg(clientBranch, apiBranch);
 
-    const clientBranch = await Bitbucket.branchExists(client, process.env.CLIENT_NAME!);
-    const apiBranch = await Bitbucket.branchExists(api, process.env.API_NAME!);
-
-    if (!clientBranch && !apiBranch) {
-        branches.error = 'Both Client and API branches do not exist, branches are case sensitive';
-    }
-
-    if (!clientBranch) {
-        branches.error = 'Client branch does not exist, branches are case sensitive';
-    }
-
-    if (!apiBranch) {
-        branches.error = 'API branch does not exist, branches are case sensitive';
-    }
-
-    return branches;
+    return branchResults;
 };
 
-export async function validate(req: DQRequest, res: Response, next: NextFunction) {
-    const branches = await validateText(req.body.text);
+export default async function validate(commands: string[]) {
+    const branches = await validateText(commands);
 
-    if (!branches.error) {
-        req.branches = branches;
-        return next();
-    }
-
-    return res.json(
-        jsonResponse({
-            text: branches.error,
-        }),
-    );
+    return branches;
 }

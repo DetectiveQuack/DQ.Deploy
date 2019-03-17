@@ -1,19 +1,24 @@
-import express from 'express';
-import { validate } from '../helpers/command-validator';
-import { jsonResponse } from '../helpers/response';
-import { DQRequest } from '../models/request';
+import express = require('express');
+import parseCommand from '../helpers/command-parser';
+import validate from '../helpers/command-validator';
+import jsonResponse from '../helpers/response';
+import makeSlackResponse from '../helpers/response-request';
+import DQRequest from '../models/request';
 
 const router = express.Router();
 
 // Route the endpoint that our slash command will point to and send back a simple response to indicate that ngrok is working
-router.post('/command', (req, res, next) => validate(req as DQRequest, res, next), async function(req, res) {
-    (req as DQRequest).responseUrl = req.body.response_url;
+router.post('/command', parseCommand, async function(req) {
+    const responseUrl = req.body.response_url;
+    const validatedBranches = await validate((req as DQRequest).commands);
 
-    const response = jsonResponse({ text: 'build initiated' });
+    if (validatedBranches.error) {
+        const body = jsonResponse({ text: validatedBranches.error });
+        return await makeSlackResponse(responseUrl, body);
+    }
 
-    res.json(response);
-
-    // Initiate build
+    const body = jsonResponse({ text: 'Hooray!! Built and deployed to https://example.com' });
+    await makeSlackResponse(responseUrl, body);
 });
 
-module.exports = router;
+export default router;

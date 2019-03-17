@@ -4,6 +4,8 @@
 
 ### Required Environment Variables to be able to run slack bot
 
+These need to be in a file called **_.env_** located in **_root_**
+
 **Bitbucket variables**
 
 -   USER = bibucket email address used to login
@@ -12,6 +14,6 @@
 
 **App Specific variables**
 
--   CLIENT_REPO = client repository name
--   API_REPO = api repository name
+-   CLIENT_REPO_NAME = client repository name
+-   API_REPO_NAME = api repository name
 -   PORT = Optional defaults to 4390
