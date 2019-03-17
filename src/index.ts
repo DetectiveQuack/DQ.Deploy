@@ -1,16 +1,17 @@
 // Import express and request modules
 import express = require('express');
-import { readdir } from 'fs';
 import * as bodyParser from 'body-parser';
+import { readdir } from 'fs';
 import { resolve } from 'path';
+
+if (process.env.NODE_ENV !== 'production') {
+    require('dotenv').config();
+}
 
 // Instantiates Express and assigns our app variable to it
 const app = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));
-
-// Again, we define a port we want to listen to
-const PORT = 4390;
 
 // Include all commands
 readdir(resolve(__dirname, './commands'), (err, files) => {
@@ -25,6 +26,9 @@ readdir(resolve(__dirname, './commands'), (err, files) => {
         app.use('/', route);
     });
 });
+
+// Again, we define a port we want to listen to
+const PORT = 4390;
 
 export default app.listen(process.env.PORT || PORT, () => {
     console.log(`listening on port ${PORT}`);
