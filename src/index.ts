@@ -11,7 +11,7 @@ if (process.env.NODE_ENV !== 'production') {
 // Instantiates Express and assigns our app variable to it
 const app = express();
 
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: false }));
 
 // Include all commands
 readdir(resolve(__dirname, './commands'), (err, files) => {

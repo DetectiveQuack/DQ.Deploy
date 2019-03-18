@@ -10,7 +10,7 @@ const router = express.Router();
 
 router.post('/command', async function(req) {
     web.chat.postEphemeral({
-        text: 'Retrieving branches...',
+        text: '',
         channel: req.body.channel_id,
         user: req.body.user_id,
     });
